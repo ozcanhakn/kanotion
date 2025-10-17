@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 // Type tanımlamaları
@@ -27,85 +28,87 @@ type Metrics = {
 };
 
 export default function KanbanLanding() {
-  const [scrollY, setScrollY] = useState(0);
-  const [flowingCards, setFlowingCards] = useState<Card[]>([
+    const router = useRouter();
+
+    const [scrollY, setScrollY] = useState(0);
+    const [flowingCards, setFlowingCards] = useState<Card[]>([
     { id: 1, x: 0, y: 20, speed: 1 },
     { id: 2, x: 0, y: 120, speed: 0.8 },
     { id: 3, x: 0, y: 220, speed: 1.2 }
-  ]);
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null); // Bu satırı değiştirin
-  const [dragState, setDragState] = useState({ dragging: false, card: null, x: 0, y: 0 });
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [metrics, setMetrics] = useState<Metrics>({ ct: 3.2, tp: 42, wip: 8 });
+    ]);
+    const [hoveredCard, setHoveredCard] = useState<number | null>(null); // Bu satırı değiştirin
+    const [dragState, setDragState] = useState({ dragging: false, card: null, x: 0, y: 0 });
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [metrics, setMetrics] = useState<Metrics>({ ct: 3.2, tp: 42, wip: 8 });
 
-  useEffect(() => {
+    useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
 const handleMouseMove = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clientY });    
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('mousemove', handleMouseMove);
     
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, []);
+    }, []);
 
-  useEffect(() => {
+    useEffect(() => {
     const interval = setInterval(() => {
-      setFlowingCards(prev => prev.map(card => ({
+        setFlowingCards(prev => prev.map(card => ({
         ...card,
         x: (card.x + card.speed) % 120
-      })));
+        })));
     }, 50);
     return () => clearInterval(interval);
-  }, []);
+    }, []);
 
-  useEffect(() => {
+    useEffect(() => {
     const metricsInterval = setInterval(() => {
-      setMetrics(prev => ({
+        setMetrics(prev => ({
         ct: +(prev.ct + (Math.random() - 0.5) * 0.1).toFixed(1),
         tp: Math.max(35, Math.min(50, prev.tp + Math.floor(Math.random() * 3 - 1))),
         wip: Math.max(5, Math.min(12, prev.wip + Math.floor(Math.random() * 3 - 1)))
-      }));
+        }));
     }, 3000);
     return () => clearInterval(metricsInterval);
-  }, []);
+    }, []);
 
   const workItems: WorkItem[] = [
     { 
-      id: 1, 
-      text: 'Optimize database queries', 
-      points: 5, 
-      age: 2,
-      blocked: false,
-      type: 'performance',
-      assignee: 'AK',
-      column: 0
+        id: 1, 
+        text: 'Optimize database queries', 
+        points: 5, 
+        age: 2,
+        blocked: false,
+        type: 'performance',
+        assignee: 'AK',
+        column: 0
     },
     { 
-      id: 2, 
-      text: 'Implement OAuth flow', 
-      points: 8, 
-      age: 5,
-      blocked: true,
-      type: 'feature',
-      assignee: 'MZ',
-      column: 1
+        id: 2, 
+        text: 'Implement OAuth flow', 
+        points: 8, 
+        age: 5,
+        blocked: true,
+        type: 'feature',
+        assignee: 'MZ',
+        column: 1
     },
     { 
-      id: 3, 
-      text: 'Fix Safari bug', 
-      points: 3, 
-      age: 1,
-      blocked: false,
-      type: 'bug',
-      assignee: 'EB',
-      column: 1
+        id: 3, 
+        text: 'Fix Safari bug', 
+        points: 3, 
+        age: 1,
+        blocked: false,
+        type: 'bug',
+        assignee: 'EB',
+        column: 1
     }
-  ];
+    ];
 
   // Bu fonksiyonu düzeltin
-  const getAgeColor = (age: number): string => {
+    const getAgeColor = (age: number): string => {
     if (age >= 5) return 'bg-red-500';
     if (age >= 3) return 'bg-yellow-500';
     return 'bg-neutral-300';
@@ -157,7 +160,8 @@ const handleMouseMove = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clie
                   <span className="font-bold tabular-nums">{metrics.wip}/12</span>
                 </div>
               </div>
-              <button className="px-6 py-3 bg-neutral-900 text-white font-mono text-xs tracking-wider hover:bg-neutral-700 transition-all transform hover:scale-105 active:scale-95">
+              <button onClick={()=>router.push('/sign-up')}
+              className="px-6 py-3 bg-neutral-900 text-white font-mono text-xs tracking-wider hover:bg-neutral-700 transition-all transform hover:scale-105 active:scale-95">
                 START
               </button>
             </div>
@@ -213,7 +217,9 @@ const handleMouseMove = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clie
                   Flow beats speed every time.
                 </p>
                 <div className="flex gap-4">
-                  <button className="px-8 py-4 bg-neutral-900 text-white font-mono text-sm tracking-wider hover:bg-neutral-700 transition-all transform hover:scale-105 active:scale-95">
+                  <button 
+                  onClick={() => router.push('/sign-up') }
+                  className="px-8 py-4 bg-neutral-900 text-white font-mono text-sm tracking-wider hover:bg-neutral-700 transition-all transform hover:scale-105 active:scale-95">
                     BEGIN FLOWING
                   </button>
                   <button className="px-8 py-4 border-2 border-neutral-900 font-mono text-sm tracking-wider hover:bg-neutral-900 hover:text-white transition-all">
